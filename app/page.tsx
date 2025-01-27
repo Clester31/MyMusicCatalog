@@ -4,23 +4,20 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useAuth } from './lib/AuthContext';
-import { user } from './types';
 import { fetchUserInfo, signOut } from './auth';
+
+import { user } from './types';
 
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
-  const [userInfo, setUserInfo] = useState<user>({ uid: '', username: '', email: '' });
+  const [userInfo, setUserInfo] = useState<user | null>(null);
 
   useEffect(() => {
     if (user) {
       fetchUserInfo(user.uid).then(fetchedUserInfo => {
         if (fetchedUserInfo) {
-          setUserInfo({
-            uid: fetchedUserInfo.uid,
-            username: fetchedUserInfo.username,
-            email: fetchedUserInfo.email,
-          });
+          setUserInfo(fetchedUserInfo);
         }
       });
     }
@@ -31,9 +28,9 @@ export default function Home() {
       {
         user ?
           <div className='text-center'>
-            <h1>Welcome back, {userInfo.username}!</h1>
+            <h1>Welcome back, {userInfo?.username}!</h1>
             <button
-              className='bg-red-500 py-4 px-2 rounded text-lg mt-4 text-white'
+              className='bg-main_danger py-4 px-2 rounded text-lg mt-4 text-white'
               onClick={() => signOut()}
             >
               Sign Out
@@ -42,7 +39,7 @@ export default function Home() {
           :
           <div className='text-center'>
             <button
-              className='bg-green-500 py-4 px-2 rounded text-lg text-white'
+              className='bg-main_positive py-4 px-2 rounded text-lg text-white'
               onClick={() => router.push('/login')}
             >
               Sign In

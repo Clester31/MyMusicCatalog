@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import LoginContainer from "../components/LoginContainer"
-import SignUpContainer from "../components/SignUpContainer"
+import LoginContainer from "../components/login/LoginContainer"
+import SignUpContainer from "../components/login/SignUpContainer"
 
 export default function Login() {
     const [loginMode, setLoginMode] = useState<boolean>(true)

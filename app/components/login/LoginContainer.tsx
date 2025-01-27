@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { signInWithEmail } from "../auth"
+import { signInWithEmail } from "../../auth"
 
 export default function LoginContainer() {
     const router = useRouter();
@@ -15,7 +15,7 @@ export default function LoginContainer() {
     }
 
     return (
-        <div className="flex flex-col w-1/3 gap-4 px-16 py-8 text-center bg-gray-100 rouded">
+        <div className="flex flex-col w-1/3 gap-4 px-16 py-8 text-center bg-gray-100 rounded border-2 border-gray-200">
             <h1>Log In</h1>
             <input
                 className="px-2 py-2 rounded"
@@ -34,7 +34,7 @@ export default function LoginContainer() {
                 onChange={(e) => setPassword(e.target.value)}
             />
             <button
-                className="bg-green-600 px-4 py-2 rounded text-white"
+                className="bg-main_positive px-4 py-2 rounded text-white"
                 onClick={handleSubmit}
             >
                 Log In
