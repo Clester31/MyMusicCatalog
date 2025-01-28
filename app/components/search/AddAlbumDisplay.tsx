@@ -1,17 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toMinSec } from "@/app/app";
 import StarRating from "../../components/search/StarRating";
+import { catalog } from "@/app/types";
 
 interface AddAlbumDisplayProps {
     albumTrackList: string[];
     setAddAlbumDisplay: (value: boolean) => void;
     addToCatalog: (albumRating: number, trackRatings: number[], reviewContent: string, catalogedDate: number[]) => void;
+    userCatalogs: catalog[];
 }
 
 export default function AddAlbumDisplay({
     albumTrackList,
     setAddAlbumDisplay,
     addToCatalog,
+    userCatalogs
 }: AddAlbumDisplayProps) {
     const [albumRating, setAlbumRating] = useState<number>(0);
     const [trackRatings, setTrackRatings] = useState<number[]>(
@@ -20,6 +23,13 @@ export default function AddAlbumDisplay({
     const [expandTracklist, setExpandTracklist] = useState<boolean>(false);
     const [reviewContent, setReviewContent] = useState<string>("");
     const [catalogedDate, setCatalogedDate] = useState<number[]>([1, 1, 2025]);
+    const [addedCatalog, setAddedCatalog] = useState<string>();
+
+    useEffect(() => {
+        if (userCatalogs.length > 0) {
+            setAddedCatalog(userCatalogs[0].cid);
+        }
+    }, [userCatalogs]);
 
     const handleAlbumRating = (rate: number) => {
         setAlbumRating(rate);
@@ -35,7 +45,7 @@ export default function AddAlbumDisplay({
     };
 
     const handleSubmit = () => {
-        addToCatalog(albumRating, trackRatings, reviewContent, catalogedDate);
+        addToCatalog(albumRating, trackRatings, reviewContent, catalogedDate, addedCatalog);
         setAddAlbumDisplay(false);
     };
 
@@ -123,12 +133,12 @@ export default function AddAlbumDisplay({
                 <h1 className="font-bold text-xl">Date Listened</h1>
                 <div className="flex flex-row w-1/2 justify-center items-center gap-4 text-xl">
                     <select
-                        className="w-1/3 border-gray-200 border-2 text-center"
+                        className="w-1/3 border-gray-200 border-2 text-center py-2"
                         defaultValue={new Date().toLocaleString("default", {
                             month: "long",
                         })}
                         onChange={(e) => {
-                            const monthIndex = new Date(Date.parse(e.target.value +" 1, 2023")).getMonth() + 1;
+                            const monthIndex = new Date(Date.parse(e.target.value + " 1, 2023")).getMonth() + 1;
                             setCatalogedDate((prevDate) => [monthIndex, prevDate[1], prevDate[2]]);
                         }}
                     >
@@ -146,7 +156,7 @@ export default function AddAlbumDisplay({
                         <option>December</option>
                     </select>
                     <input
-                        className="w-1/3 border-gray-200 border-2 text-center"
+                        className="w-1/3 border-gray-200 border-2 text-center py-2"
                         type="number"
                         name="date-day"
                         id="date-day"
@@ -156,7 +166,7 @@ export default function AddAlbumDisplay({
                         onChange={(e) => setCatalogedDate((prevDate) => [prevDate[0], parseInt(e.target.value), prevDate[2]])}
                     />
                     <input
-                        className="w-1/3 border-gray-200 border-2 text-center"
+                        className="w-1/3 border-gray-200 border-2 text-center py-2"
                         type="number"
                         name="date-year"
                         id="date-year"
@@ -166,13 +176,29 @@ export default function AddAlbumDisplay({
                     />
                 </div>
             </div>
-            <button
-                disabled={albumRating === 0}
-                className="disabled:bg-blue-500/25 text-xl bg-main_1 w-1/3 px-4 py-2 m-auto text-white rounded hover:bg-main_3 transition 250 ease-in-out"
-                onClick={handleSubmit}
-            >
-                Add to catalog
-            </button>
+            {
+                <div className="flex flex-col items-center bg-gray-100 rounded py-2 gap-4 border-gray-200 border-2">
+                    <h1 className="font-bold text-xl">Select a catalog to add to</h1>
+                    <select className="w-32 text-center text-xl py-2 rounded border-2 border-gray-300" onChange={(e) => setAddedCatalog(e.target.value)}>
+                        {
+                            userCatalogs &&
+                            userCatalogs.map((catalog, idx) => {
+                               return (
+                                <option key={idx} value={catalog.cid}>{catalog.catalogTitle}</option>
+                               )
+                            })
+                        }
+                    </select>
+                    <button
+                        disabled={albumRating === 0}
+                        className="disabled:bg-blue-500/25 text-xl bg-main_1 w-1/3 px-4 py-2 m-auto text-white rounded hover:bg-main_3 transition 250 ease-in-out"
+                        onClick={handleSubmit}
+                    >
+                        Add to catalog
+                    </button>
+                </div>
+            }
+
         </div>
     );
 }

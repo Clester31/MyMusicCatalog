@@ -1,20 +1,34 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { getAlbum, getArtistCatalog } from "../app";
 import SearchedAlbum from "../components/search/SearchedAlbum";
 import AddAlbumDisplay from "../components/search/AddAlbumDisplay";
 import { useAuth } from "../lib/AuthContext";
+import { addItemToCatalog, fetchUserInfo } from "../auth";
+import { catalog, catalogItem, track, user } from "../types";
+import { v4 as uuidv4 } from 'uuid'
 
 export default function SearchPage() {
-    const { user } = useAuth();
+    const { user }: { user: user | null } = useAuth();
 
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchMode, setSearchMode] = useState<string>('artist');
     const [searchData, setSearchData] = useState<object[]>([]);
     const [albumTrackList, setAlbumTrackList] = useState<string[]>([]);
-    const [albumGenreTags, setAlbumGenreTags] = useState<string[]>([]);
+    const [otherAlbumInfo, setOtherAlbumInfo] = useState<object>({title: '', artist: '', coverArt: ''});
     const [addAlbumDisplay, setAddAlbumDisplay] = useState<boolean>(false);
+    const [userCatalogs, setUserCatalogs] = useState<catalog[]>([]);
+
+    useEffect(() => {
+        if (user) {
+            fetchUserInfo(user.uid).then(fetchedUserInfo => {
+                if (fetchedUserInfo) {
+                    setUserCatalogs(fetchedUserInfo.catalogs);
+                }
+            });
+        }
+    }, [user, userCatalogs])
 
     const updateSearchPage = async () => {
         let fetchedSearchData;
@@ -26,8 +40,19 @@ export default function SearchPage() {
         setSearchData(fetchedSearchData);
     }
 
-    const addToCatalog = (albumRating: number, trackRatings: number[], reviewContent: string, catalogedDate: number[]) => {
-        
+    const addToCatalog = (albumRating: number, trackRatings: track[], reviewContent: string, catalogedDate: number[], addedCatalog: string) => {
+        const newCatalogEntry: catalogItem = {
+            iid: uuidv4(),
+            itemCoverArt: otherAlbumInfo.title,
+            itemTitle: otherAlbumInfo.artist,
+            itemArtist: otherAlbumInfo.coverArt,
+            itemTracks: trackRatings,
+            itemReview: reviewContent,
+            itemRating: albumRating,
+            itemDate: catalogedDate
+        } 
+        console.log('added to', addedCatalog)
+        addItemToCatalog(user.uid, newCatalogEntry, addedCatalog);
     }
 
     return (
@@ -35,9 +60,9 @@ export default function SearchPage() {
             {
                 addAlbumDisplay &&
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-                    <AddAlbumDisplay albumTrackList={albumTrackList} setAddAlbumDisplay={setAddAlbumDisplay} addToCatalog={addToCatalog} />
+                    <AddAlbumDisplay albumTrackList={albumTrackList} setAddAlbumDisplay={setAddAlbumDisplay} addToCatalog={addToCatalog} userCatalogs={userCatalogs}/>
                 </div>
-                
+
             }
             <div className="flex flex-col items-center justify-center gap-4 mt-8">
                 <input
@@ -84,7 +109,7 @@ export default function SearchPage() {
                 <div className="grid grid-cols-6 p-8 gap-8">
                     {
                         searchData.map((album: any, index: number) => (
-                            <SearchedAlbum key={index} album={album} index={index} setAlbumTrackList={setAlbumTrackList} setAddAlbumDisplay={setAddAlbumDisplay} searchMode={searchMode} />
+                            <SearchedAlbum key={index} album={album} index={index} setAlbumTrackList={setAlbumTrackList} setAddAlbumDisplay={setAddAlbumDisplay} searchMode={searchMode} setOtherAlbumInfo={setOtherAlbumInfo} />
                         ))
                     }
                 </div>

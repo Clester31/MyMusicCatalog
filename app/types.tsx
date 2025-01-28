@@ -23,6 +23,7 @@ export type catalogItem = {
     itemTracks: track[];
     itemReview: string;
     itemRating: number;
+    itemDate: number[];
 }
 
 export type track = {
