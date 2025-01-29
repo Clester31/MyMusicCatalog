@@ -22,12 +22,17 @@ export default function CatalogEntry({ item }: { item: catalogItem }) {
             <div className="top-0 left-full w-0 h-64 bg-white overflow-hidden transition-all duration-300 group-hover:w-full px-4 group-hover:block hidden overflow-y-auto">
                 <p>{item.itemReview}</p>
                 <div className="mt-4 overflow-y-auto text-lg">
-                    {item.itemTracks.map((track, index) => (
-                        <div key={index} className="flex justify-between items-center mb-2 bg-gray-100 px-2 py-2">
-                            <h1 className="w-5/6">{track.trackTitle}</h1>
-                            <h1 className="font-bold text-main_1 w-1/6 text-end">{track.trackRating}</h1>
-                        </div>
-                    ))}
+                    {
+                        item.itemTracks.length > 0 ?
+                        item.itemTracks.map((track, index) => (
+                            <div key={index} className="flex justify-between items-center mb-2 bg-gray-100 px-2 py-2">
+                                <h1 className="w-5/6">{track.trackTitle}</h1>
+                                <h1 className="font-bold text-main_1 w-1/6 text-end">{track.trackRating === 0 ? '-' : track.trackRating}</h1>
+                            </div>
+                        ))
+                        :
+                        <h1 className="flex justify-between items-center mb-2 bg-gray-100 px-2 py-2">No Tracklist Available</h1>
+                    }
                 </div>
             </div>
         </div>

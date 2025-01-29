@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toMinSec } from "@/app/app";
 import StarRating from "../../components/search/StarRating";
-import { catalog } from "@/app/types";
+import { catalog, track } from "@/app/types";
 
 interface AddAlbumDisplayProps {
     albumTrackList: string[];
@@ -17,9 +17,7 @@ export default function AddAlbumDisplay({
     userCatalogs
 }: AddAlbumDisplayProps) {
     const [albumRating, setAlbumRating] = useState<number>(0);
-    const [trackRatings, setTrackRatings] = useState<track[]>(
-        new Array(albumTrackList.length).fill(0)
-    );
+    const [trackRatings, setTrackRatings] = useState<track[]>([])
     const [expandTracklist, setExpandTracklist] = useState<boolean>(false);
     const [reviewContent, setReviewContent] = useState<string>("");
     const [catalogedDate, setCatalogedDate] = useState<number[]>([1, 1, 2025]);
@@ -29,7 +27,8 @@ export default function AddAlbumDisplay({
         if (userCatalogs.length > 0) {
             setAddedCatalog(userCatalogs[0].cid);
         }
-    }, [userCatalogs]);
+        setTrackRatings(albumTrackList.map(track => ({ trackTitle: track.name, duration: track.duration, trackRating: 0 })));
+    }, [userCatalogs, albumTrackList]);
 
     const handleAlbumRating = (rate: number) => {
         setAlbumRating(rate);
@@ -183,9 +182,9 @@ export default function AddAlbumDisplay({
                         {
                             userCatalogs &&
                             userCatalogs.map((catalog, idx) => {
-                               return (
-                                <option key={idx} value={catalog.cid}>{catalog.catalogTitle}</option>
-                               )
+                                return (
+                                    <option key={idx} value={catalog.cid}>{catalog.catalogTitle}</option>
+                                )
                             })
                         }
                     </select>
