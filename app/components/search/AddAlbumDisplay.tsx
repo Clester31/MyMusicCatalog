@@ -17,7 +17,7 @@ export default function AddAlbumDisplay({
     userCatalogs
 }: AddAlbumDisplayProps) {
     const [albumRating, setAlbumRating] = useState<number>(0);
-    const [trackRatings, setTrackRatings] = useState<track[]>([])
+    const [trackRatings, setTrackRatings] = useState<track[]>(albumTrackList.map(track => ({ trackTitle: track.name, duration: track.duration, trackRating: 0 })));
     const [expandTracklist, setExpandTracklist] = useState<boolean>(false);
     const [reviewContent, setReviewContent] = useState<string>("");
     const [catalogedDate, setCatalogedDate] = useState<number[]>([1, 1, 2025]);
@@ -27,8 +27,7 @@ export default function AddAlbumDisplay({
         if (userCatalogs.length > 0) {
             setAddedCatalog(userCatalogs[0].cid);
         }
-        setTrackRatings(albumTrackList.map(track => ({ trackTitle: track.name, duration: track.duration, trackRating: 0 })));
-    }, [userCatalogs, albumTrackList]);
+    }, [userCatalogs]);
 
     const handleAlbumRating = (rate: number) => {
         setAlbumRating(rate);
