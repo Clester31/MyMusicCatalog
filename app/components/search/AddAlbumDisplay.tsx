@@ -17,7 +17,7 @@ export default function AddAlbumDisplay({
     userCatalogs
 }: AddAlbumDisplayProps) {
     const [albumRating, setAlbumRating] = useState<number>(0);
-    const [trackRatings, setTrackRatings] = useState<number[]>(
+    const [trackRatings, setTrackRatings] = useState<track[]>(
         new Array(albumTrackList.length).fill(0)
     );
     const [expandTracklist, setExpandTracklist] = useState<boolean>(false);
@@ -36,10 +36,10 @@ export default function AddAlbumDisplay({
         console.log(albumRating);
     };
 
-    const handleTrackRating = (rate: number, idx: number) => {
+    const handleTrackRating = (rate: number, idx: number, trackName: string, trackDuration: number) => {
         setTrackRatings((prevRatings) => {
             const newRatings = [...prevRatings];
-            newRatings[idx] = rate;
+            newRatings[idx] = { trackTitle: trackName, duration: trackDuration, trackRating: rate };
             return newRatings;
         });
     };
@@ -88,7 +88,7 @@ export default function AddAlbumDisplay({
                                                         maxRating={10}
                                                         size={20}
                                                         onSetRating={(rate: number) =>
-                                                            handleTrackRating(rate, idx)
+                                                            handleTrackRating(rate, idx, track.name, track.duration)
                                                         }
                                                     />
                                                 </div>

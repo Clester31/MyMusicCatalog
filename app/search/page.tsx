@@ -43,9 +43,9 @@ export default function SearchPage() {
     const addToCatalog = (albumRating: number, trackRatings: track[], reviewContent: string, catalogedDate: number[], addedCatalog: string) => {
         const newCatalogEntry: catalogItem = {
             iid: uuidv4(),
-            itemCoverArt: otherAlbumInfo.title,
-            itemTitle: otherAlbumInfo.artist,
-            itemArtist: otherAlbumInfo.coverArt,
+            itemCoverArt: otherAlbumInfo.coverArt,
+            itemTitle: otherAlbumInfo.title,
+            itemArtist: otherAlbumInfo.artist,
             itemTracks: trackRatings,
             itemReview: reviewContent,
             itemRating: albumRating,

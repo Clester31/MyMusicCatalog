@@ -27,7 +27,6 @@ export type catalogItem = {
 }
 
 export type track = {
-    tid: string;
     trackTitle: string;
     trackDuration: string;
     trackRating: number;

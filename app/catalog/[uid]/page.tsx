@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { catalog, user } from '@/app/types';
 import AddCatalogDisplay from '@/app/components/catalog/AddCatalogDisplay';
 import { useAuth } from '@/app/lib/AuthContext';
+import CatalogItem from '@/app/components/catalog/CatalogItem';
 
 export default function Catalog() {
     const params = useParams();
@@ -52,26 +53,16 @@ export default function Catalog() {
                 userCatalog.length > 0 ?
                     <div className='w-screen flex flex-col justify-center m-auto items-center gap-8'>
                         {
-                            userCatalog.map((catalog, idx) => {
-                                return (
-                                    <div key={idx} className='flex flex-row p-4 bg-gray-200 border-4 border-gray-300 rounded-lg shadow-lg w-2/3 hover:border-main_1 transition 250 ease-in-out cursor-pointer items-center'>
-                                        <img className='w-48 rounded' src={catalog.catalogImage} alt="catalog image" />
-                                        <div className='flex flex-col p-4 gap-2 w-4/5'>
-                                            <h1 className='text-4xl font-semibold'>{catalog.catalogTitle}</h1>
-                                            <p className='text-xl p-2'>{catalog.catalogDescription}</p>
-                                        </div>
-                                        {
-                                            canEdit &&
-                                            <div>
-                                                <button className='bg-red-500 px-4 py-2 rounded text-xl text-white h-16 hover:bg-red-400 transition 250 ease-in-out' onClick={() => {
-                                                    removeCatalog(uid, catalog.cid)
-                                                    router.push(`/catalog/${uid}`);
-                                                }}>Delete</button>
-                                            </div>
-                                        }
-                                    </div>
-                                )
-                            })
+                            userCatalog.map((catalog, idx) => (
+                                <CatalogItem
+                                    key={idx}
+                                    catalog={catalog}
+                                    canEdit={canEdit}
+                                    uid={uid}
+                                    removeCatalog={removeCatalog}
+                                    router={router}
+                                />
+                            ))
                         }
                         <button
                             className='bg-main_1 hover:bg-main_3 transition 250 ease-in-out px-8 py-6 text-6xl rounded text-white'

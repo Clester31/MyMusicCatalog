@@ -44,6 +44,7 @@ export default function Navbar() {
                     <div>
                         <button
                             className="bg-main_1 px-4 py-1 rounded-2xl text-white hover:bg-main_2 transition 250 ease-in"
+                            onClick={() => router.push('/login')}
                         >
                             Log In / Sign Up
                         </button>
