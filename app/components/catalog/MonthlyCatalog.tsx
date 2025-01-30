@@ -1,25 +1,10 @@
 import { useEffect, useState } from "react";
-import { catalog, catalogItem } from "@/app/types";
+import { catalog, catalogItem, user } from "@/app/types";
 import MonthRow from "./MonthRow";
 
 export default function MonthlyCatalog({ currentCatalog }: { currentCatalog: catalog }) {
     const [monthlyItems, setMonthlyItems] = useState<catalogItem[][]>(Array.from({ length: 12 }, () => []));
-    const [defaultColors, setDefaultColors] = useState<string[]>(
-        [
-            "#FF6666", // Light Red
-            "#FF7F50", // Coral
-            "#FFA500", // Orange
-            "#FFEC8B", // Light Goldenrod Yellow
-            "#BFFF00", // Lime
-            "#66CD66", // Pale Green
-            "#66FFB2", // Aquamarine
-            "#66D9E8", // Sky Blue
-            "#63B8FF", // Light Sky Blue
-            "#AB82FF", // Light Purple
-            "#FFB6C1", // Light Pink
-            "#FF6EB4"  // Pale Violet Red
-        ]
-    )
+    const [defaultColors, setDefaultColors] = useState<string[]>(currentCatalog.catalogDefaultColors)
 
     useEffect(() => {
         function sortItemsByMonth() {
@@ -41,7 +26,7 @@ export default function MonthlyCatalog({ currentCatalog }: { currentCatalog: cat
                 monthlyItems.map((monthItems, monthIdx) => {
                     return (
                         <div key={monthIdx}>
-                            <MonthRow monthItems={monthItems} month={monthIdx} color={defaultColors[monthIdx]} />
+                            <MonthRow cid={currentCatalog.cid} monthItems={monthItems} month={monthIdx} color={defaultColors[monthIdx]} setDefaultColors={setDefaultColors} />
                         </div>
                     );
                 })

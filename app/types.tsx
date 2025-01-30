@@ -13,6 +13,7 @@ export type catalog = {
     catalogTitle: string;
     catalogDescription: string;
     catalogImage: string;
+    catalogDefaultColors: string[];
 }
 
 export type catalogItem = {

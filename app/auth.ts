@@ -92,7 +92,8 @@ export const createCatalog = async (uid: string, newCatalog: catalog) => {
                 catalogTitle: newCatalog.catalogTitle,
                 catalogDescription: newCatalog.catalogDescription,
                 catalogItems: newCatalog.catalogItems,
-                catalogImage: newCatalog.catalogImage
+                catalogImage: newCatalog.catalogImage,
+                catalogDefaultColors: newCatalog.catalogDefaultColors,
             })
         })
     } catch (error: any) {

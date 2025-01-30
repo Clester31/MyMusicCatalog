@@ -7,8 +7,8 @@ export default function CatalogEntry({ item }: { item: catalogItem }) {
         <div className="bg-white flex flex-row w-48 h-72 p-4 rounded border-2 border-gray-300 relative group hover:w-1/4 transition-all duration-250 ease-in-out text-white hover:text-black shadow-md">
             <div className="flex-shrink-0">
                 <div className="flex flex-col"></div>
-                <h1 className="text-black font-semibold">{item.itemTitle}</h1>
-                <h1 className="text-black italic">{item.itemArtist}</h1>
+                <h1 className="text-black font-semibold truncate">{item.itemTitle}</h1>
+                <h1 className="flex text-black italic truncate overflow:hidden">{item.itemArtist}</h1>
                 <img className="w-40 rounded shadow-md" alt="cover art" src={item.itemCoverArt}></img>
                 <div className="flex flex-row items-center text-3xl gap-2 mt-2">
                     <StarRating

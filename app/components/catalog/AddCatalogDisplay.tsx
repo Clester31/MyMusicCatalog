@@ -22,7 +22,21 @@ export default function AddCatalogDisplay({ setShowAddAlbumDisplay, uid }: { uid
             catalogTitle: catalogTitle,
             catalogDescription: catalogDescription,
             catalogItems: [],
-            catalogImage: catalogImageURL
+            catalogImage: catalogImageURL,
+            catalogDefaultColors: [
+                "#FF6666", // Light Red
+                "#FF7F50", // Coral
+                "#FFA500", // Orange
+                "#FFEC8B", // Light Goldenrod Yellow
+                "#BFFF00", // Lime
+                "#66CD66", // Pale Green
+                "#66FFB2", // Aquamarine
+                "#66D9E8", // Sky Blue
+                "#63B8FF", // Light Sky Blue
+                "#AB82FF", // Light Purple
+                "#FFB6C1", // Light Pink
+                "#FF6EB4"  // Pale Violet Red
+            ]
         };
 
         createCatalog(uid, newCatalog);
@@ -59,11 +73,11 @@ export default function AddCatalogDisplay({ setShowAddAlbumDisplay, uid }: { uid
                     </button>
                     {
                         imageURL ?
-                        <img className="w-48" src={URL.createObjectURL(imageURL)} alt="uploaded catalog image rounded"/>
-                        :
-                        <div className="flex h-48 w-48 text-center justify-center items-center border-gray-300 border-4 rounded">
-                            <h1>No Image Uploaded</h1>
-                        </div>
+                            <img className="w-48" src={URL.createObjectURL(imageURL)} alt="uploaded catalog image rounded" />
+                            :
+                            <div className="flex h-48 w-48 text-center justify-center items-center border-gray-300 border-4 rounded">
+                                <h1>No Image Uploaded</h1>
+                            </div>
                     }
                 </div>
 
