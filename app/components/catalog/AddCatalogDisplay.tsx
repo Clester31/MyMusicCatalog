@@ -19,6 +19,7 @@ export default function AddCatalogDisplay({ setShowAddAlbumDisplay, uid }: { uid
         const catalogImageURL: string = await addImageToStorage(imageURL, uid, '/catalogImages');
         const newCatalog: catalog = {
             cid: uuidv4(),
+            catalogCreatedBy: uid,
             catalogTitle: catalogTitle,
             catalogDescription: catalogDescription,
             catalogItems: [],

@@ -20,6 +20,7 @@ export default function CatalogPost() {
     const [userInfo, setUserInfo] = useState<user | null>(null);
     const [currentCatalog, setCurrentCatalog] = useState<catalog | null>(null);
     const [catalogType, setCatalogType] = useState<string>('monthly');
+    const [editPermissions, setEditPermissions] = useState<boolean>(false);
 
     useEffect(() => {
         if (uid && cid) {
@@ -28,6 +29,9 @@ export default function CatalogPost() {
                     setUserInfo(fetchedUserInfo);
                     const userCatalog = fetchedUserInfo.catalogs.find(item => item.cid === cid);
                     setCurrentCatalog(userCatalog || null);
+                    if(uid === user.uid) {
+                        setEditPermissions(true);
+                    }
                 }
             });
         }
@@ -69,9 +73,9 @@ export default function CatalogPost() {
                     currentCatalog &&
                     (
                         catalogType === 'monthly' ?
-                        <MonthlyCatalog currentCatalog={currentCatalog} />
+                        <MonthlyCatalog currentCatalog={currentCatalog} editPermissions={editPermissions} />
                         :
-                        <GeneralCatalog />
+                        <GeneralCatalog currentCatalog={currentCatalog} editPermissions={editPermissions} />
                     )
                 }
             </div>

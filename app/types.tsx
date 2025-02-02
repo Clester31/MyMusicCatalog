@@ -9,6 +9,7 @@ export type user = {
 
 export type catalog = {
     cid: string;
+    catalogCreatedBy: string
     catalogItems: catalogItem[];
     catalogTitle: string;
     catalogDescription: string;
