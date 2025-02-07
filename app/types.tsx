@@ -3,13 +3,14 @@ export type user = {
     username: string;
     email: string;
     profilePicture: string;
-    catalogs: catalog[];
+    catalogs: string[];
     lists: [];
 }
 
 export type catalog = {
     cid: string;
     catalogCreatedBy: string
+    catalogCreatedOn: string;
     catalogItems: catalogItem[];
     catalogTitle: string;
     catalogDescription: string;
@@ -32,4 +33,10 @@ export type track = {
     trackTitle: string;
     trackDuration: string;
     trackRating: number;
+}
+
+export type album = {
+    name: string;
+    artist: string;
+    image: { '#text': string }[];
 }

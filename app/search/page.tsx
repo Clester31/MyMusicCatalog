@@ -5,8 +5,8 @@ import { getAlbum, getArtistCatalog } from "../app";
 import SearchedAlbum from "../components/search/SearchedAlbum";
 import AddAlbumDisplay from "../components/search/AddAlbumDisplay";
 import { useAuth } from "../lib/AuthContext";
-import { addItemToCatalog, fetchUserInfo } from "../auth";
-import { catalog, catalogItem, track, user } from "../types";
+import { addItemToCatalog, fetchCatalog, fetchUserInfo } from "../auth";
+import { catalog, catalogItem, track, user, userInfo } from "../types";
 import { v4 as uuidv4 } from 'uuid'
 
 export default function SearchPage() {
@@ -22,13 +22,19 @@ export default function SearchPage() {
 
     useEffect(() => {
         if (user) {
-            fetchUserInfo(user.uid).then(fetchedUserInfo => {
+            fetchUserInfo(user.uid).then((fetchedUserInfo: userInfo) => {
                 if (fetchedUserInfo) {
-                    setUserCatalogs(fetchedUserInfo.catalogs);
+                    const uniqueCatalogs = new Set(fetchedUserInfo.catalogs);
+                    uniqueCatalogs.forEach(async (catalogId) => {
+                        if (!userCatalogs.some(userCatalog => userCatalog.id === catalogId)) {
+                            const fetchedCatalog = await fetchCatalog(catalogId);
+                            setUserCatalogs(prev => [...prev, fetchedCatalog]);
+                        }
+                    });
                 }
             });
         }
-    }, [user, userCatalogs])
+    }, [user])
 
     const updateSearchPage = async () => {
         let fetchedSearchData;
@@ -52,7 +58,7 @@ export default function SearchPage() {
             itemDate: catalogedDate
         } 
         console.log('added to', addedCatalog)
-        addItemToCatalog(user.uid, newCatalogEntry, addedCatalog);
+        addItemToCatalog(newCatalogEntry, addedCatalog);
     }
 
     return (
@@ -64,7 +70,7 @@ export default function SearchPage() {
                 </div>
 
             }
-            <div className="flex flex-col items-center justify-center gap-4 mt-8">
+            <div className="flex flex-col items-center justify-center gap-4 mt-8 mt-32">
                 <input
                     type="text"
                     placeholder={`search for an ${searchMode === 'artist' ? 'artist' : 'album'}`}

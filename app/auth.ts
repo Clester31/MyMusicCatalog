@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
-import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { db } from "@/firebaseConfig";
 import { catalog, catalogItem, track, user } from "./types";
@@ -22,8 +22,12 @@ export const signUpWithEmail = async (email: string, username: string, password:
             catalogs: [],
             lists: []
         });
-    } catch (error) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
@@ -32,15 +36,23 @@ export const signInWithEmail = async (email: string, password: string) => {
         const userCredentials = await signInWithEmailAndPassword(auth, email, password);
         return userCredentials.user;
     } catch (error: unknown) {
-        throw error.message;
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
 export const signOut = async () => {
     try {
         await auth.signOut();
-    } catch (error: any) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
@@ -59,8 +71,12 @@ export const fetchUserInfo = async (uid: string): Promise<user | null> => {
             }
         }
         return null;
-    } catch (error: any) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
@@ -69,173 +85,198 @@ export const updateUsername = async (uid: string, newUsername: string) => {
         await updateDoc(doc(db, "users", uid), {
             username: newUsername
         });
-    } catch (error: any) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
-export const updateProfilePicture = async (uid: string, newProfilePicture: string) => {
-    // try {
-    //     await updateDoc(doc(db, "users", uid), {
+// export const updateProfilePicture = async (uid: string, newProfilePicture: string) => {
+//     // try {
+//     //     await updateDoc(doc(db, "users", uid), {
 
-    //     })
-    // } catch (error) {
+//     //     })
+//     // } catch (error) {
 
-    // }
+//     // }
+// }
+
+export const fetchCatalog = async (cid: string) => {
+    try {
+        const catalogData = await getDoc(doc(db, "catalogs", cid));
+        return catalogData.data() as catalog;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
+    }
+}
+
+export const fetchAllCatalogs = async () => {
+    try {
+        const catalogsCollection = await getDocs(collection(db, "catalogs"));
+        return catalogsCollection.docs.map(doc => doc.data() as catalog);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
+    }
 }
 
 export const createCatalog = async (uid: string, newCatalog: catalog) => {
     try {
+        // Add the new catalog to the catalogs collection
+        await setDoc(doc(db, "catalogs", newCatalog.cid), {
+            cid: newCatalog.cid,
+            catalogCreatedBy: newCatalog.catalogCreatedBy,
+            catalogTitle: newCatalog.catalogTitle,
+            catalogDescription: newCatalog.catalogDescription,
+            catalogItems: newCatalog.catalogItems,
+            catalogImage: newCatalog.catalogImage,
+            catalogDefaultColors: newCatalog.catalogDefaultColors,
+        });
+
+        // Update the user's document to include only the catalog ID
         await updateDoc(doc(db, "users", uid), {
-            catalogs: arrayUnion({
-                cid: newCatalog.cid,
-                catalogCreatedBy: newCatalog.catalogCreatedBy,
-                catalogTitle: newCatalog.catalogTitle,
-                catalogDescription: newCatalog.catalogDescription,
-                catalogItems: newCatalog.catalogItems,
-                catalogImage: newCatalog.catalogImage,
-                catalogDefaultColors: newCatalog.catalogDefaultColors,
-            })
-        })
-    } catch (error: any) {
-        throw error.message;
+            catalogs: arrayUnion(newCatalog.cid)
+        });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
 export const removeCatalog = async (uid: string, cid: string) => {
     try {
+        // Delete the catalog document from the catalogs collection
+        await deleteDoc(doc(db, "catalogs", cid));
+
+        // Update the user's document to remove the catalog ID
         const userDoc = await getDoc(doc(db, "users", uid));
         if (userDoc.exists()) {
             const userData = userDoc.data();
-            const updatedCatalogs = userData.catalogs.filter((catalog: catalog) => catalog.cid !== cid);
+            const updatedCatalogs = userData.catalogs.filter((catalogId: string) => catalogId !== cid);
             await updateDoc(doc(db, "users", uid), {
                 catalogs: updatedCatalogs
             });
         }
-    } catch (error: any) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
-export const addItemToCatalog = async (uid: string, newCatalogEntry: catalogItem, cid: string) => {
+export const addItemToCatalog = async (newCatalogEntry: catalogItem, cid: string) => {
     try {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        if(userDoc.exists()) {
-            const userData = userDoc.data();
-            const updatedCatalogs = userData.catalogs.map((catalog: catalog) => {
-                if (catalog.cid === cid) {
-                    return {
-                        ...catalog,
-                        catalogItems: [...catalog.catalogItems, newCatalogEntry]
-                    };
-                }
-                return catalog;
-            });
-            await updateDoc(doc(db, "users", uid), {
-                catalogs: updatedCatalogs
+        const catalogDoc = await getDoc(doc(db, "catalogs", cid));
+        if (catalogDoc.exists()) {
+            const catalogData = catalogDoc.data();
+            const updatedCatalogItems = [...catalogData.catalogItems, newCatalogEntry];
+            await updateDoc(doc(db, "catalogs", cid), {
+                catalogItems: updatedCatalogItems
             });
         }
-    } catch (error: any) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
-export const updateCatalogAlbumRating = async (uid: string, cid: string, iid: string, newAlbumRating: number ) => {
+export const updateCatalogAlbumRating = async (cid: string, iid: string, newAlbumRating: number ) => {
     try {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const updatedCatalogs = userData.catalogs.map((catalog: catalog) => {
-                if (catalog.cid === cid) {
-                    const updatedItems = catalog.catalogItems.map((item: catalogItem) => {
-                        if (item.iid === iid) {
-                            return {
-                                ...item,
-                                itemRating: newAlbumRating
-                            };
-                        }
-                        return item;
-                    });
+        const catalogDoc = await getDoc(doc(db, "catalogs", cid));
+        if (catalogDoc.exists()) {
+            const catalogData = catalogDoc.data();
+            const updatedCatalogItems = catalogData.catalogItems.map((item: catalogItem) => {
+                if (item.iid === iid) {
                     return {
-                        ...catalog,
-                        catalogItems: updatedItems
+                        ...item,
+                        itemRating: newAlbumRating
                     };
                 }
-                return catalog;
+                return item;
             });
-            await updateDoc(doc(db, "users", uid), {
-                catalogs: updatedCatalogs
+            await updateDoc(doc(db, "catalogs", cid), {
+                catalogItems: updatedCatalogItems
             });
         }
-    } catch (error: any) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
 export const deleteAlbumFromCatalog = async (uid: string, cid: string, iid: string) => {
     try {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const updatedCatalogs = userData.catalogs.map((catalog: catalog) => {
-                if (catalog.cid === cid) {
-                    const updatedItems = catalog.catalogItems.filter((item: catalogItem) => item.iid !== iid);
-                    return {
-                        ...catalog,
-                        catalogItems: updatedItems
-                    };
-                }
-                return catalog;
-            });
-            await updateDoc(doc(db, "users", uid), {
-                catalogs: updatedCatalogs
+        const catalogDoc = await getDoc(doc(db, "catalogs", cid));
+        if (catalogDoc.exists()) {
+            const catalogData = catalogDoc.data();
+            const updatedCatalogItems = catalogData.catalogItems.filter((item: catalogItem) => item.iid !== iid);
+            await updateDoc(doc(db, "catalogs", cid), {
+                catalogItems: updatedCatalogItems
             });
         }
-    } catch (error: any) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 
-export const updateCatalogTrackRating = async (uid: string, cid: string, iid: string, trackNo: number, newTrackRating: number) => {
+export const updateCatalogTrackRating = async (cid: string, iid: string, trackNo: number, newTrackRating: number) => {
     try {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const updatedCatalogs = userData.catalogs.map((catalog: catalog) => {
-                if (catalog.cid === cid) {
-                    const updatedItems = catalog.catalogItems.map((item: catalogItem) => {
-                        if (item.iid === iid) {
-                            const updatedTracks = item.itemTracks.map((track: track, index: number) => {
-                                console.log(track.trackTitle, newTrackRating);
-                                if (index === trackNo) {
-                                    console.log('updating..')
-                                    return {
-                                        ...track,
-                                        trackRating: newTrackRating
-                                    };
-                                }
-                                return track;
-                            });
+        const catalogDoc = await getDoc(doc(db, "catalogs", cid));
+        if (catalogDoc.exists()) {
+            const catalogData = catalogDoc.data();
+            const updatedCatalogItems = catalogData.catalogItems.map((item: catalogItem) => {
+                if (item.iid === iid) {
+                    const updatedTracks = item.itemTracks.map((track: track, index: number) => {
+                        if (index === trackNo) {
                             return {
-                                ...item,
-                                itemTracks: updatedTracks
-                            };
+                                ...track,
+                                trackRating: newTrackRating
+                            }
                         }
-                        return item;
+                        return track;
                     });
                     return {
-                        ...catalog,
-                        catalogItems: updatedItems
-                    };
+                        ...item,
+                        itemTracks: updatedTracks
+                    }
                 }
-                return catalog;
+                return item;
             });
-            await updateDoc(doc(db, "users", uid), {
-                catalogs: updatedCatalogs
+            await updateDoc(doc(db, "catalogs", cid), {
+                catalogItems: updatedCatalogItems
             });
         }
-    } catch (error: any) {
-        throw error.message;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw error.message;
+        } else {
+            throw String(error);
+        }
     }
 }
 

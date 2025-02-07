@@ -16,7 +16,7 @@ export default function Login() {
                     <SignUpContainer />
             }
             <h1
-                className="text-center text-blue-500 mt-4 cursor-pointer"
+                className="text-center text-blue-500 text-lg mt-4 cursor-pointer"
                 onClick={() => setLoginMode(!loginMode)}
             >
                 {

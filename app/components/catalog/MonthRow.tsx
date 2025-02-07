@@ -1,12 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 import { getMonth } from "@/app/app";
 import { catalogItem } from "@/app/types";
 import CatalogEntry from "./CatalogEntry";
 import { useState } from "react";
-import { hsvaToHex } from '@uiw/color-convert';
+import { HsvaColor, hsvaToHex } from '@uiw/color-convert';
 import { useAuth } from "@/app/lib/AuthContext";
-import { fetchUserInfo } from "@/app/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import ColorSelector from "./ColorSelector";
 
@@ -15,24 +13,22 @@ export default function MonthRow({ cid, monthItems, month, year, color, setDefau
     const [editRow, setEditRow] = useState<boolean>(false);
     const { user } = useAuth();
 
-    const changeRowColor = (hsva) => {
+    const changeRowColor = async (hsva: HsvaColor) => {
         const hexColor = hsvaToHex(hsva);
-        let newColors: string[];
-        setDefaultColors((prevColors: string[]) => {
-            newColors = [...prevColors];
-            newColors[month] = hexColor;
-            return newColors;
-        });
+        let newColors: string[] = [];
+        newColors = [...color];
+        newColors[month] = hexColor;
+        setDefaultColors(newColors);
         if (user) {
-            fetchUserInfo(user.uid).then(fetchedUserInfo => {
-                const updatedCatalogs = fetchedUserInfo.catalogs.map(catalog => {
-                    if (catalog.cid === cid) {
-                        return { ...catalog, catalogDefaultColors: newColors };
-                    }
-                    return catalog;
+            const catalogDoc = await getDoc(doc(db, 'catalogs', cid));
+            if(catalogDoc.exists()) {
+                const catalogData = catalogDoc.data();
+                const updatedColors = catalogData.catalogDefaultColors;
+                updatedColors[month] = hexColor;
+                await updateDoc(doc(db, 'catalogs', cid), {
+                    catalogDefaultColors: updatedColors
                 });
-                updateDoc(doc(db, "users", user.uid), { catalogs: updatedCatalogs });
-            });
+            }
         }
         setEditRow(false);
     };
@@ -55,7 +51,7 @@ export default function MonthRow({ cid, monthItems, month, year, color, setDefau
                 {monthItems.length > 0 ? (
                     monthItems
                         .filter(item => item.itemDate[2] === year)
-                        .map((item, idx) => <CatalogEntry key={idx} cid={cid} item={item} editPermissions={editPermissions} user={user} />)
+                        .map((item, idx) => user && <CatalogEntry key={idx} cid={cid} item={item} editPermissions={editPermissions} uid={user.uid} />)
                 ) : (
                     <div>
                         

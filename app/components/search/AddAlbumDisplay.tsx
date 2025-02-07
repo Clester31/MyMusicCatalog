@@ -20,7 +20,11 @@ export default function AddAlbumDisplay({
     const [trackRatings, setTrackRatings] = useState<track[]>(albumTrackList.map(track => ({ trackTitle: track.name, duration: track.duration, trackRating: 0 })));
     const [expandTracklist, setExpandTracklist] = useState<boolean>(false);
     const [reviewContent, setReviewContent] = useState<string>("");
-    const [catalogedDate, setCatalogedDate] = useState<number[]>([1, 1, 2025]);
+    const [catalogedDate, setCatalogedDate] = useState<number[]>([
+        new Date().getMonth() + 1,
+        new Date().getDate(),
+        new Date().getFullYear()
+    ]);
     const [addedCatalog, setAddedCatalog] = useState<string>();
 
     useEffect(() => {

@@ -16,7 +16,7 @@ export default function GeneralCatalog({ currentCatalog, editPermissions }: { cu
             {
                 allCatalogItems.map((catalogItem, idx) => {
                     return (
-                        <CatalogEntry key={idx} cid={currentCatalog.cid} item={catalogItem} editPermissions={editPermissions} user={user} />
+                        user && <CatalogEntry key={idx} cid={currentCatalog.cid} item={catalogItem} editPermissions={editPermissions} uid={user.uid} />
                     )
                 })
             }

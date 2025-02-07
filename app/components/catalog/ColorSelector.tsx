@@ -2,9 +2,13 @@ import Wheel from "@uiw/react-color-wheel";
 import { hsvaToHex } from '@uiw/color-convert';
 import { useState } from "react";
 
+import { HsvaColor } from '@uiw/color-convert';
+
+
+
 interface ColorSelectorProps {
     setEditRow: (value: boolean) => void;
-    changeRowColor: () => void;
+    changeRowColor: (hsva: HsvaColor) => void;
 }
 
 export default function ColorSelector({ setEditRow, changeRowColor }: ColorSelectorProps) {

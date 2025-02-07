@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { catalogItem, user } from "@/app/types";
+import { catalogItem } from "@/app/types";
 import StarRating from "../search/StarRating";
 import { useState } from "react";
 import { deleteAlbumFromCatalog, updateCatalogAlbumRating, updateCatalogTrackRating } from "@/app/auth";
 
-export default function CatalogEntry({ cid, item, editPermissions, user }: { cid: string, item: catalogItem, editPermissions: boolean, user: user }) {
+export default function CatalogEntry({ cid, item, editPermissions, uid }: { cid: string, item: catalogItem, editPermissions: boolean, uid: string }) {
     const [editRating, setEditRating] = useState<boolean>(false);
     const [editTrackRating, setEditTrackRating] = useState<number | null>(null);
     const [newAlbumRating, setNewAlbumRating] = useState<number | null>(1);
@@ -13,7 +13,7 @@ export default function CatalogEntry({ cid, item, editPermissions, user }: { cid
     const updateAlbumRating = () => {
         setEditRating(false);
         if (newAlbumRating !== null) {
-            updateCatalogAlbumRating(user.uid, cid, item.iid, newAlbumRating);
+            updateCatalogAlbumRating(cid, item.iid, newAlbumRating);
         }
     }
 
@@ -21,7 +21,7 @@ export default function CatalogEntry({ cid, item, editPermissions, user }: { cid
         setEditTrackRating(null);
         console.log(newTrackRating);
         if (newTrackRating !== null) {
-            updateCatalogTrackRating(user.uid, cid, item.iid, index, newTrackRating);
+            updateCatalogTrackRating(cid, item.iid, index, newTrackRating);
         }
     }
 
@@ -49,7 +49,7 @@ export default function CatalogEntry({ cid, item, editPermissions, user }: { cid
                                     !editRating &&
                                     <button
                                         className="text-black bg-red-200 hover:bg-main_1 hover:text-white transition 250 ease-in-out rounded p-2 rounded-md h-8 flex items-center ml-2"
-                                        onClick={() => deleteAlbumFromCatalog(user.uid, cid, item.iid)}
+                                        onClick={() => deleteAlbumFromCatalog(uid, cid, item.iid)}
                                     >
                                         <i className="fa-solid fa-trash w-4 text-sm"></i>
                                     </button>

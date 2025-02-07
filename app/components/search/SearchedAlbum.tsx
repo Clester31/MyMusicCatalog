@@ -1,8 +1,6 @@
 import { getAlbumInfo } from "@/app/app";
-import { useEffect, useState } from "react";
 
 /* eslint-disable @next/next/no-img-element */
-
 
 interface Album {
     name: string;
